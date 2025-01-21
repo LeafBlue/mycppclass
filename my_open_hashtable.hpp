@@ -1,6 +1,7 @@
 #pragma once
 #include<vector>
 #include<utility>
+#include<functional>
 
 //开放寻址法哈希表
 /*
@@ -63,24 +64,26 @@ protected:
 		new_hash_t.swap(hash_t);
 		new_flag.swap(flag);
 		capacity = new_size;
+		//计数器重置
+		data_num = 0;
 		for (size_t i = 0; i < hash_size; i++)
 		{
 			//当前位置 已占用，不是空，也不是已删除，理论上我只要处理这些就行了
 			if (new_flag[i] == 1) {
-				insertdata(new_hash_t[i].first, new_hash_t[i].second)
+				insertdata(new_hash_t[i].first, new_hash_t[i].second);
 			}
 		}
 	}
 
 	//计算哈希值
 	//这个函数使用了标准库hash计算法，并且象征性地特别考虑了int和string
-	size_t get_hash_index(Tkey& key) {
+	size_t get_hash_index(const Tkey& key) {
 		if constexpr (std::is_same_v<Tkey, int>) {
 			return std::hash<int>()(key) % capacity;
 		}
 		else if constexpr (std::is_same_v<Tkey, string>) {
 			size_t hashvalue = 0;
-			for (size_t i = 0; i < key.size; i++)
+			for (size_t i = 0; i < key.size(); i++)
 			{
 				char c = key[i];
 				hashvalue = hashvalue * 31 + c;
@@ -96,9 +99,9 @@ protected:
 	//此函数应满足以下条件：
 	// 1，不为0，否则会无限循环在同一位置
 	// 2，最好与哈希表大小互质
-	size_t get_step(Tkey& key) {
+	size_t get_step(const Tkey& key) {
 		//先得到主哈希值，这里我们直接调用标准库函数
-		size main_hash = std::hash<Tkey>()(key);
+		size_t main_hash = std::hash<Tkey>()(key);
 		//设置一个固定的较小模数
 		size_t mod_data = 7;
 		//公式（万一算出来是0，再加一个1）
@@ -126,8 +129,8 @@ public:
 	~my_open_hashtable() = default;
 
 	//插入数据
-	void insertdata(Tkey& key, Tval& val) {
-		size_t index = get_hash_index(Tkey & key);
+	void insertdata(const Tkey& key, const Tval& val) {
+		size_t index = get_hash_index(key);
 		std::pair<Tkey, Tval> p1(key, val);
 		if (index >= capacity) {
 			//扩容
@@ -138,6 +141,7 @@ public:
 			//可直接插入
 			flag[index] = 1;
 			hash_t[index] = p1;
+			++data_num;
 			chech_len();
 		}
 		else if (flag_num == 1) {
@@ -153,7 +157,7 @@ public:
 
 			//占用情况下，key键和要插入的数据是否一致，如果一致，可更新val值
 			if (hash_t[index].first == key) {
-				hash_t[index].second = value;
+				hash_t[index].second = val;
 				return;
 			}
 			//定义一个检测次数，每次循环减少一次
@@ -174,7 +178,7 @@ public:
 				flag_num = flag.at(index);
 				if (flag_num == 1) {//占用情况，检查当前占用值是不是key，是的话修改值后结束函数
 					if (hash_t[index].first == key) {
-						hash_t[index].second = value;
+						hash_t[index].second = val;
 						return;
 					}
 				}
@@ -182,6 +186,7 @@ public:
 					//插入数据
 					flag[index] = 1;
 					hash_t[index] = p1;
+					++data_num;
 					chech_len();
 					break;
 				}
@@ -194,6 +199,7 @@ public:
 			//可直接插入
 			flag[index] = 1;
 			hash_t[index] = p1;
+			++data_num;
 			chech_len();
 		}
 	}
@@ -201,7 +207,7 @@ public:
 	//查找
 	Tval* find_key(const Tkey& key) {
 		//计算它有可能在的位置
-		size_t index = get_hash_index(Tkey & key);
+		size_t index = get_hash_index(key);
 		int flag_num = flag.at(index);
 		if (flag_num == 0) {
 			//空槽，说明数据根本没有进来过
@@ -239,7 +245,7 @@ public:
 	//删除
 	void delete_key(const Tkey& key) {
 		//计算它有可能在的位置
-		size_t index = get_hash_index(Tkey & key);
+		size_t index = get_hash_index(key);
 		int flag_num = flag.at(index);
 		if (flag_num == 0) {
 			//空槽，说明没有这个数据
@@ -252,6 +258,7 @@ public:
 				//等待此处数据被填充即可，修改标志位
 				//hash_t[index] = p1;
 				flag[index] = 2;//标志设为已删除
+				--data_num;
 				return;
 			}
 		}
@@ -270,6 +277,7 @@ public:
 			if (flag_num == 1) {//占用情况
 				if (hash_t[index].first == key) {
 					flag[index] = 2;//标志设为已删除
+					--data_num;
 					return;
 				}
 			}
@@ -280,7 +288,7 @@ public:
 
 	size_t count(const Tkey& key) {
 		//计算它有可能在的位置
-		size_t index = get_hash_index(Tkey & key);
+		size_t index = get_hash_index(key);
 		int flag_num = flag.at(index);
 		if (flag_num == 0) {
 			//空槽，说明数据根本没有进来过
@@ -325,33 +333,162 @@ public:
 		using reference = std::pair<const Tkey&, Tval&>;
 		using pointer = std::pair<const Tkey*, Tval*>;
 
-		void get_next() {
-			while (index< hash_table->capacity&&flag[index] != 1) {
-				index++;
+		bool get_next() {
+			if (index_ < hash_table->capacity) {
+				++index_;//不检查当前index
 			}
+			else {
+				return false;
+			}
+			while (index_ < hash_table->capacity)
+			{
+				if (hash_table->flag[index_] == 1) {//1：有效槽
+					return true;
+				}
+				++index_;
+			}
+			return false;
 		}
+
+		bool get_prev() {
+			if (index_ > 0) {
+				--index_;
+			}
+			else {
+				return false;
+			}
+			while (index_ >= 0)
+			{
+				if (my_open_hashtable::flag[index_] == 1) {//1：有效槽
+					return true;
+				}
+				--index_;
+			}
+			return false;
+		}
+
+		friend class my_open_hashtable<Tkey, Tval>;
 
 	public:
 		iterator() {}
 
+		iterator(my_open_hashtable<Tkey, Tval>* new_hash_t,size_t newindex) {
+			hash_table = new_hash_t;
+			index_ = newindex;
+
+			//确保第一个index是有效的
+			if (index_ < hash_table->capacity&& hash_table->flag[index_] != 1) {
+				get_next();
+			}
+		}
+
 		// * 和 ->
 		//我们这里返回的是一个std::pair<const Tkey&, Tval&>，因此我们需要构造一个临时的pair，它里面的两个键绑定了容器里的数据
 		reference operator*() {
-			return { hash_table->hash_t[index].first, hash_table->hash_t[index].second };
+			return { hash_table->hash_t[index_].first, hash_table->hash_t[index_].second };
 		}
 		//我们这里返回的是一个std::pair<const Tkey*, Tval*>
 		//在这两个例子中，我们返回的是一个临时对象，但是它内部包含的是指针和引用。
 		//指针和引用的值来自容器内部，是一个长期存在的值。
 		//因此这个临时对象会被销毁，但我们依然可以访问到里面的值。
 		pointer operator->() {
-			return { hash_table->hash_t[index].first, hash_table->hash_t[index].second };
+			return { hash_table->hash_t[index_].first, hash_table->hash_t[index_].second };
 		}
 
-		iterator operator+() {
-			
-
+		iterator operator+(int n) {
+			while (n > 0) {
+				get_next();
+				n--;
+			}
 			return this;
+		}
+		//这个函数的实现不支持负数
+		iterator operator+(size_t n) {
+			iterator temp = *this;
+			while (n > 0) {
+				if (!temp.get_next()) {
+					break;
+				}
+				--n;
+			}
+			if (n > 0) {
+				temp.index_ = hash_table->capacity;
+			}
+			return temp;
+		}
+		//这个函数的实现不支持负数
+		iterator operator-(size_t n) {
+			iterator temp = *this;
+			while (n > 0) {
+				if (!temp.get_prev()) {
+					break;
+				}
+				--n;
+			}
+			if (n > 0) {
+				temp.index_ = -1;
+			}
+			return temp;
+		}
+
+		
+		iterator& operator++() {
+			if (get_next()) {
+				return *this;
+			}
+			index_ = hash_table->capacity;
+			return *this;
+		}
+
+		iterator& operator--() {
+			if (get_prev()) {
+				return *this;
+			}
+			index_ = -1;
+			return *this;
+		}
+
+		iterator operator++(int) {
+			iterator temp = *this;
+			if (get_next()) {
+				return temp;
+			}
+			index_ = hash_table->capacity;
+			return temp;
+		}
+
+		iterator operator--(int) {
+			iterator temp = *this;
+			if (get_prev()) {
+				return *temp;
+			}
+			index_ = -1;
+			return *temp;
+		}
+
+		bool operator==(const iterator& other)const noexcept {
+			return index_ == other.index_;
+		}
+
+		bool operator!=(const iterator& other)const noexcept {
+			return index_ != other.index_;
 		}
 
 	};
+
+	iterator begin() {
+		return iterator(this,0);
+	}
+
+	iterator end() {
+		return iterator(this, capacity);
+	}
+
+	size_t getcount() {
+		return data_num;
+	}
+
+	size_t getcapacity() {
+		return capacity;
+	}
 };

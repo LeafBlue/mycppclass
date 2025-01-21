@@ -6,6 +6,7 @@
 template<class Tkey, class Tval>
 class my_unordered_map :public my_open_hashtable<Tkey, Tval> {
 	using base_class = my_open_hashtable<Tkey, Tval>;
+	using _iter = typename base_class::iterator;
 	
 	/*
 		my_open_hashtable有着private的成员变量，这些变量无法被派生类访问，但会随着对象创建而构造
@@ -71,6 +72,14 @@ class my_unordered_map :public my_open_hashtable<Tkey, Tval> {
 
 	//获取指定元素值的元素个数
 	size_t count(Tkey& key) {
-		count(key);
+		return count(key);
+	}
+
+	_iter begin() {
+		return base_class::begin();
+	}
+
+	_iter end() {
+		return base_class::end();
 	}
 };

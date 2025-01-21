@@ -27,7 +27,7 @@ public:
 	//工厂
 	template<typename... Args>
 	static my_unique_ptr<T> makemy_unique_ptr(Args&&...args) {
-		return my_unique_ptr<T>(new T(std::forward<Args>(args)...))
+		return my_unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
 
 	//移动构造函数

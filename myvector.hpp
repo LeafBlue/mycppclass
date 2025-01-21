@@ -52,10 +52,10 @@ public:
 		}
 
 	//移动构造
-	myvector(myvector& other) noexcept
+	myvector(myvector&& other) noexcept
 		:t_arr(other.t_arr)
 		,capability(other.capability)
-		,size(other.size)
+		,size(other.size) 
 	{
 		other.t_arr = nullptr;
 	}
@@ -83,7 +83,7 @@ public:
 		iterator() {}
 		//operator*：返回迭代器所指向的元素的引用。
 		T& operator*() const {
-			return ptr;
+			return *ptr;
 		}
 		//operator->：返回指向成员的指针（对于指针类型的迭代器来说，这通常直接返回 ptr->）。
 		T* operator->()const {
@@ -128,7 +128,7 @@ public:
 			return iterator(ptr - n);
 		}
 		//std::ptrdiff_t 这是一个标准库用于表示指针差值的符号
-		std::ptrdiff_t operator-(const iterator &_it)noexcept const {
+		std::ptrdiff_t operator-(const iterator &_it)const noexcept  {
 			return ptr - _it.ptr;
 		}
 		//operator+= 和 operator-=：原地增加或减少指定数量的步长。
@@ -141,10 +141,10 @@ public:
 			return *this;
 		}
 		//关系操作符（如 <、 <= 、>、 >= ）：支持迭代器之间的比较。
-		bool operator<(const iterator& _it)noexcept	const { return ptr < _it.ptr; }
-		bool operator<=(const iterator& _it)noexcept	const { return ptr <= _it.ptr; }
-		bool operator>(const iterator& _it)noexcept	const { return ptr > _it.ptr; }
-		bool operator>=(const iterator& _it)noexcept	const { return ptr >= _it.ptr; }
+		bool operator<(const iterator& _it)const noexcept { return ptr < _it.ptr; }
+		bool operator<=(const iterator& _it)const noexcept { return ptr <= _it.ptr; }
+		bool operator>(const iterator& _it)const noexcept { return ptr > _it.ptr; }
+		bool operator>=(const iterator& _it)const noexcept { return ptr >= _it.ptr; }
 		//myvector的begin和end要调用这里的构造函数，给他一个友元
 		friend class myvector<T>;
 	};
@@ -187,7 +187,7 @@ public:
 		return size == 0;
 	}
 	//返回当前 vector 中元素的数量。
-	size_t size() {
+	size_t size_() {
 		return size;
 	}
 
@@ -222,8 +222,8 @@ public:
 	//shrink_to_fit()：尽可能减少已分配但未使用的空间（C++11 及以上）。
 	bool shrink_to_fit() {
 		if (capability > size) {
+			T* oldarr = t_arr;
 			try {
-				T* oldarr = t_arr;
 				t_arr = new T[size];
 				for (size_t i = 0; i < size; i++)
 				{
@@ -275,8 +275,9 @@ public:
 		}
 		else {
 			//容量达到上限，不能添加了
+			T* temparr = nullptr;
 			try {
-				T* temparr = new T[static_cast<size_t>(capability * 1.5)];
+				temparr = new T[static_cast<size_t>(capability * 1.5)];
 				for (size_t i = 0; i < size; i++)
 				{
 					temparr[i] = t_arr[i];
@@ -307,8 +308,9 @@ public:
 		}
 		else {
 			//容量达到上限，不能添加了
+			T* temparr = nullptr;
 			try {
-				T* temparr = new T[static_cast<size_t>(capability * 1.5)];
+				temparr = new T[static_cast<size_t>(capability * 1.5)];
 				for (size_t i = 0; i < size; i++)
 				{
 					temparr[i] = t_arr[i];
@@ -381,7 +383,7 @@ public:
 	}
 	//	erase(iterator pos)：移除指定位置的元素。
 	void erase(iterator pos) {
-		if (pos < begin() || pos > =end()) {
+		if (pos < begin() || pos >= end()) {
 			throw std::out_of_range("Iterator out of range");
 		}
 		size_t index = pos - t_arr;
@@ -411,7 +413,7 @@ public:
 
 		size_t first_index = first - t_arr;
 		size_t last_index = last - t_arr;
-		del_count = last_index - first_index;
+		size_t del_count = last_index - first_index;
 
 		for (size_t i = first_index; i < last_index; i ++) {
 			if constexpr (!std::is_trivially_destructible_v <T>) {

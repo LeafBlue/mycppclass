@@ -6,18 +6,19 @@
 
 template<typename T>
 class mylist {
+private:
 	struct Node {
 		T data;
 		Node* prev;
 		Node* next;
 
-		Node(const& T val) :data(val), prev(nullptr), next(nullptr) {};
+		Node(const T& val) :data(val), prev(nullptr), next(nullptr) {};
 	};
 
 	Node* head;
 	Node* tail;
 	size_t node_count;
-
+public:
     // 构造函数和析构函数
     mylist() 
         :head(nullptr),tail(nullptr),node_count(0)
@@ -91,7 +92,7 @@ class mylist {
         newnode->next = position;
         newnode->prev = posi_prev;
         position->prev = newnode;
-        posi_next->next = newnode;
+        posi_prev->next = newnode;
         node_count++;
     }
 
@@ -184,7 +185,7 @@ class mylist {
     class iterator {
     private:
         Node* ptr;
-        iterator(Node &node)
+        iterator(Node *node)
         {
             ptr = node;
         };
@@ -192,10 +193,10 @@ class mylist {
         iterator() {};
         //解引用操作符
         T& operator*() const {
-            return ptr;
+            return ptr->data;
         }
         T* operator->() const {
-            return ptr;
+            return ptr->data;
         }
         //递增操作符
         //前置递增：Iterator& operator++()

@@ -3,8 +3,6 @@
 #include<vector>
 #
 /*
-https://blog.csdn.net/zcg3063126760/article/details/144312287
-https://blog.csdn.net/BuiderCodes/article/details/143034584
 */
 class mystring {
 private:
@@ -321,7 +319,20 @@ std::ostream& operator<<(std::ostream& cout, const mystring& my_str) {
 	return cout;
 }
 
-char* mystrcpy(char* str_a,const size_t size,const char* str_b) {
+
+
+size_t mystrlen(const char* str) {
+	if (str == NULL) {
+		return 0;
+	}
+	size_t i = 0;
+	while (str[i] != '\0') {
+		i++;
+	}
+	return i;
+}
+
+char* mystrcpy(char* str_a, const size_t size, const char* str_b) {
 	size_t len = mystrlen(str_b);
 	if (size < len) {
 		return nullptr;
@@ -336,16 +347,5 @@ char* mystrcpy(char* str_a,const size_t size,const char* str_b) {
 	}
 	str_a[len] = '\0';
 	return str_a;
-}
-
-size_t mystrlen(const char* str) {
-	if (str == NULL) {
-		return 0;
-	}
-	size_t i = 0;
-	while (str[i] != '\0') {
-		i++;
-	}
-	return i;
 }
 
