@@ -107,4 +107,96 @@ public:
 		return false;
 	}
 
+	class iterator {
+	private:
+		//当前容器指针
+		my_list_hashtable<Tkey,Tval>* hashtable_;
+		//当前桶指针
+		size_t index_;
+		//当前链表指向单个元素的迭代器
+		std::list<std::pair<Tkey, Tval>>::iterator thisit;
+	public:
+
+		iterator() {}
+
+		iterator(my_list_hashtable<Tkey, Tval>* hashtable, size_t index_, list<std::pair<Tkey, Tval>>::iterator it) {
+			hashtable_ = hashtable;
+			this->index_ = index_;
+			thisit = it;
+		}
+
+		iterator& operator++() {
+			++thisit;
+			if (hashtable_->buckets[index_].end == thisit) {//当前桶到头了
+				if (index_+ 1 == hashtable_->buckets.size()) {//后面没有桶
+					index_ = hashtable_->buckets.size();
+					thisit = hashtable_->buckets[0].end();
+					return *this;
+				}
+				else {//后面还有桶
+					++index_;
+					while (index_ < hashtable_->buckets.size()) {
+						if (!hashtable_->buckets[index_].empty()) {//链表不为空，有存储值
+							thisit = hashtable_->buckets[index_].begin();
+							return *this;
+						}
+						++index_;
+					}
+				}
+			}
+			else {
+				return *this;
+			}
+		}
+
+		iterator& operator--() {
+			if (hashtable_->buckets[index_].begin() == thisit) {//当前桶到开头了，得找上个桶
+				if (index_== 0) {//前面没有桶，返回一个不存在的迭代器
+					index_ = hashtable_->buckets.size();
+					thisit = hashtable_->buckets[0].end();
+					return *this;
+				}
+				else {//前面还有桶
+					while (index_ > 0) {
+						--index_;
+						if (!hashtable_->buckets[index_].empty()) {//链表不为空，有存储值
+							thisit = hashtable_->buckets[index_].begin();
+							return *this;
+						}
+					}
+				}
+			}
+			else {
+				--thisit;
+				return *this;
+			}
+		}
+		//此迭代器如果实现 + - 会变得没有必要且效率低下，这里就不实现了
+		std::pair<Tkey, Tval>& operator*() {
+			return *thisit;
+		}
+
+		std::pair<Tkey, Tval>* operator->() {
+			//虽然这里thisit也可以->取到元素的属性，但它不是我们要的这个东西，它是个链表迭代器
+			//这里先解引用取到元素本身，然后再取地址返回
+			return &(*thisit);
+		}
+
+	};
+
+
+	iterator begin() {
+		size_t i = 0;
+		while (i < this->buckets.size()) {
+			if (!this->buckets[i].empty()) {//第i个链表不为空，有存储值
+				return iterator(this, i, this->buckets[i].begin());
+			}
+			++i;
+		}
+		return end();
+	}
+
+	iterator end() {
+		iterator(this, this->buckets.size(), list<std::pair<Tkey,Tval>>::iterator());
+	}
 };

@@ -5,6 +5,7 @@
 
 template<class Tkey, class Tval>
 class my_unordered_map :public my_open_hashtable<Tkey, Tval> {
+private:
 	using base_class = my_open_hashtable<Tkey, Tval>;
 	using _iter = typename base_class::iterator;
 	
@@ -15,6 +16,7 @@ class my_unordered_map :public my_open_hashtable<Tkey, Tval> {
 		当派生类和父类存在同样的成员，直接访问得到的是派生类成员，父类的成员会被隐藏，需要双冒号::访问
 	*/
 	
+public:
 
 	//构造函数
 	//调用父类的构造函数，不能通过代码构造，只能通过初始化列表构造
@@ -28,45 +30,45 @@ class my_unordered_map :public my_open_hashtable<Tkey, Tval> {
 	~my_unordered_map() = default;
 
 	//查找
-	Tval find(const Tkey& tkey) {
+	Tval* find(const Tkey& tkey) {
 		return base_class::find_key(tkey);
 	}
 
 	//添加
-	void insert(Tkey& key,Tval& val) {
+	void insert(const Tkey& key, const Tval& val) {
 		base_class::insertdata(key, val);
 	}
 
 	//删除
-	void erase(Tkey& key) {
+	void erase(const Tkey& key) {
 		base_class::delete_key(key);
 	}
 
 	size_t size() {
-		return data_num;
+		return base_class::data_num;
 	}
 
 	bool empty() {
-		return data_num == 0;
+		return base_class::data_num == 0;
 	}
 
 
 	void clear() {
-		hash_t.clear();
-		flag.clear();
-		capacity = 13;
-		data_num = 0;
+		base_class::hash_t.clear();
+		base_class::flag.clear();
+		base_class::capacity = 13;
+		base_class::data_num = 0;
 	}
 
 	void swap(my_unordered_map& other_map) {
-		hash_t.swap(other_map.hash_t);
-		flag.swap(other_map.flag);
+		base_class::hash_t.swap(other_map.hash_t);
+		base_class::flag.swap(other_map.flag);
 
-		size_t temp_capacity = capacity;
-		capacity = other_map.capacity;
+		size_t temp_capacity = base_class::capacity;
+		base_class::capacity = other_map.capacity;
 		other_map.capacity = temp_capacity;
-		size_t temp_data_num = data_num;
-		data_num = other_map.data_num;
+		size_t temp_data_num = base_class::data_num;
+		base_class::data_num = other_map.data_num;
 		other_map.data_num = temp_data_num;
 	}
 

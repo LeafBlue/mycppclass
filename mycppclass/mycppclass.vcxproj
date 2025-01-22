@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\my_redblack_tree.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\mylist.hpp" />
@@ -27,6 +28,7 @@
     <ClInclude Include="..\myvector.hpp" />
     <ClInclude Include="..\my_list_hashtable.hpp" />
     <ClInclude Include="..\my_open_hashtable.hpp" />
+    <ClInclude Include="..\my_ordered_set.hpp" />
     <ClInclude Include="..\my_share_ptr.hpp" />
     <ClInclude Include="..\my_unique_ptr.hpp" />
     <ClInclude Include="..\my_unordered_map.hpp" />

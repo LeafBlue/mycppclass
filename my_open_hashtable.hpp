@@ -491,4 +491,46 @@ public:
 	size_t getcapacity() {
 		return capacity;
 	}
+
+	//set用查找，找到key并返回迭代器
+	iterator set_find(const Tkey& key) {
+		//计算它有可能在的位置
+		size_t index = get_hash_index(key);
+		int flag_num = flag.at(index);
+		if (flag_num == 0) {
+			//空槽，说明数据根本没有进来过
+			iterator it(this,-1);
+			return it;
+		}
+		else if (flag_num == 1) {
+			//占用，检查当前是否一致
+			if (hash_t[index].first == key) {
+				iterator it(this, index);
+				return it;
+			}
+		}
+		//走到这里的皆是需要查找其他位置
+		//执行查找其他位置操作
+		size_t check_times = capacity;
+		while (true) {
+			if (check_times == 0) {
+				//check_times减完了没找到
+				iterator it(this, -1);
+				return it;
+			}
+			//探测下一个坐标
+			//这里采用取模运算，保证取值一直在表容量内
+			index = (index + get_step(key)) % capacity;
+			flag_num = flag.at(index);
+			if (flag_num == 1) {//占用情况
+				if (hash_t[index].first == key) {
+					iterator it(this, index);
+					return it;
+				}
+			}
+			--check_times;
+			//继续循环
+		}
+	}
+
 };

@@ -9,6 +9,7 @@ using namespace std;
 #include <chrono>
 #include <string>
 #include <unordered_map>
+#include"my_unordered_map.hpp"
 
 int main() {
 	/*
@@ -82,12 +83,12 @@ int main() {
 	for (my_open_hashtable<string, mystring>::iterator it = moh->begin(); it != moh->end(); it++) {
 		cout << (*it).first << "--" << (*it).second << endl;
 	}*/
-
-	my_open_hashtable<std::string, int> hashtable(10000);
+	/*
+	my_unordered_map<std::string, int> hashtable(10000);
 	auto start = std::chrono::high_resolution_clock::now();
 	for (size_t i = 0; i < 10000; ++i)
 	{
-		hashtable.insertdata(std::to_string(i),i);
+		hashtable.insert(std::to_string(i),i);
 	}
 	auto end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> insert_time = end - start;
@@ -98,7 +99,7 @@ int main() {
 	start = std::chrono::high_resolution_clock::now();
 	for (size_t i = 0; i < 10000; ++i)
 	{
-		hashtable.find_key(std::to_string(i));
+		hashtable.find(std::to_string(i));
 	}
 	end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> find_time = end - start;
@@ -108,7 +109,7 @@ int main() {
 	start = std::chrono::high_resolution_clock::now();
 	for (size_t i = 0; i < 10000; ++i)
 	{
-		hashtable.delete_key(std::to_string(i));
+		hashtable.erase(std::to_string(i));
 	}
 	end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> erase_time = end - start;
@@ -145,7 +146,7 @@ int main() {
 	end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> erase_time1 = end - start;
 	std::cout << "erase time: \t" << erase_time1.count() << "\tseconds" << std::endl;
-	
+	*/
 
 	/*
 		比较结果：
