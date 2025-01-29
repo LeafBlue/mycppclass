@@ -161,7 +161,7 @@ public:
 	myvector& operator=(myvector &other) {
 		if (this != &other) {
 			T* oldarr = t_arr;
-			T* temp;
+			T* temp = nullptr;
 			try {
 				temp = new T[other.capability];
 				for (size_t i = 0; i < other.size; i++)

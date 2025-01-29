@@ -33,7 +33,7 @@ private:
 
 		//构造
 		node(std::pair<Tkey, Tval> data_in) {
-			node_color = RED;
+			node_color = node::color::RED;
 			data = data_in;
 			left = nullptr;
 			right = nullptr;
@@ -56,7 +56,7 @@ private:
 		int flag2 = 0;
 		node* fa_node = cur_node->father;
 		if (fa_node != nullptr) {
-			if (fa_node->node_color == RED) {//当是黑色时直接插入即可，不用做任何处理
+			if (fa_node->node_color == node::color::RED) {//当是黑色时直接插入即可，不用做任何处理
 				//检查叔节点
 				//1,获取curnode的叔节点，也就是thisnode的兄弟节点
 				node* gra_node = fa_node->father;
@@ -76,10 +76,10 @@ private:
 					flag2 = 2;
 				}
 
-				if (uncle_node != nullptr && uncle_node->node_color == RED) {
+				if (uncle_node != nullptr && uncle_node->node_color == node::color::RED) {
 					//当叔节点不为空 并且叔节点是红色时
-					fa_node->node_color = BLACK;
-					uncle_node->node_color = BLACK;
+					fa_node->node_color = node::color::BLACK;
+					uncle_node->node_color = node::color::BLACK;
 					//将祖父节点作为当前节点 继续处理
 					//理论上旋转只要局部旋转， 处理祖父节点不需要考虑旋转，给参数0
 					check_color(gra_node,0);
@@ -109,8 +109,8 @@ private:
 							//祖父变成了爹的儿子，切断它与左节点的关系，保留右节点关系
 							gra_node->left = nullptr;
 							//修改颜色
-							fa_node->node_color = BLACK;
-							gra_node->node_color = RED;
+							fa_node->node_color = node::color::BLACK;
+							gra_node->node_color = node::color::RED;
 						}
 						else {//不存在曾祖父，说明什么？说明祖父就是根节点
 							//将父节点转换为根节点
@@ -120,8 +120,8 @@ private:
 							fa_node->right = gra_node;
 							gra_node->father = fa_node;
 							//修改颜色
-							fa_node->node_color = BLACK;
-							gra_node->node_color = RED;//新插入的也是RED，此时它是当前根的左孩子，就不改了
+							fa_node->node_color = node::color::BLACK;
+							gra_node->node_color = node::color::RED;//新插入的也是node::color::RED，此时它是当前根的左孩子，就不改了
 						}
 					}
 					//左右情况：当前节点是父节点的右孩子，父节点是祖父节点的左孩子。
@@ -151,8 +151,8 @@ private:
 							}
 							cur_node->father = gra_fa_node;
 							//把当前节点改为黑色，（原）父亲已经是红色了，不需要修改
-							cur_node->node_color = BLACK;
-							gra_node->node_color = RED;
+							cur_node->node_color = node::color::BLACK;
+							gra_node->node_color = node::color::RED;
 						}
 						else {
 							//祖父就是根节点
@@ -165,8 +165,8 @@ private:
 							cur_node->father = nullptr;
 							rootnode = cur_node;
 							//重新设置颜色
-							cur_node->node_color = BLACK;
-							gra_node->node_color = RED;
+							cur_node->node_color = node::color::BLACK;
+							gra_node->node_color = node::color::RED;
 						}
 					}
 					//右右情况：当前节点是父节点的右孩子，父节点是祖父节点的右孩子。
@@ -188,8 +188,8 @@ private:
 							//祖父变成了爹的儿子，切断它与右节点的关系
 							gra_node->right = nullptr;
 							//修改颜色
-							fa_node->node_color = BLACK;
-							gra_node->node_color = RED;
+							fa_node->node_color = node::color::BLACK;
+							gra_node->node_color = node::color::RED;
 						}
 						else {//不存在曾祖父，说明什么？说明祖父就是根节点
 							//将父节点转换为根节点
@@ -199,8 +199,8 @@ private:
 							fa_node->left = gra_node;
 							gra_node->father = fa_node;
 							//修改颜色
-							fa_node->node_color = BLACK;
-							gra_node->node_color = RED;
+							fa_node->node_color = node::color::BLACK;
+							gra_node->node_color = node::color::RED;
 						}
 					}
 					//右左情况：当前节点是父节点的左孩子，父节点是祖父节点的右孩子。
@@ -229,8 +229,8 @@ private:
 							}
 							cur_node->father = gra_fa_node;
 							//把当前节点改为黑色，（原）父亲已经是红色了，不需要修改
-							cur_node->node_color = BLACK;
-							gra_node->node_color = RED;
+							cur_node->node_color = node::color::BLACK;
+							gra_node->node_color = node::color::RED;
 						}
 						else {
 							//祖父就是根节点
@@ -243,8 +243,8 @@ private:
 							cur_node->father = nullptr;
 							rootnode = cur_node;
 							//重新设置颜色
-							cur_node->node_color = BLACK;
-							gra_node->node_color = RED;
+							cur_node->node_color = node::color::BLACK;
+							gra_node->node_color = node::color::RED;
 						}
 					}
 				}
@@ -263,7 +263,7 @@ public:
 	void insert(const Tkey& key,const Tval& val) {
 		if (size_ == 0) {
 			node *node_ = new node(std::pair<Tkey, Tval>(key,val));
-			node_->node_color = BLACK;
+			node_->node_color = node::color::BLACK;
 			rootnode = node_;
 			++size_;
 		}

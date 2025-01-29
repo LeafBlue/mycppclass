@@ -167,10 +167,18 @@ public:
     }
 
     // 访问操作
-    T& front();
-    const T& front() const;
-    T& back();
-    const T& back() const;
+    T& front() {
+        return head->data;
+    }
+    const T& front() const{
+        return head->data;
+    }
+    T& back() {
+        return tail->data;
+    }
+    const T& back() const {
+        return tail->data;
+    }
 
     // 大小和状态
     size_t size() const {

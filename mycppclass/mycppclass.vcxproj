@@ -32,6 +32,7 @@
     <ClInclude Include="..\my_share_ptr.hpp" />
     <ClInclude Include="..\my_unique_ptr.hpp" />
     <ClInclude Include="..\my_unordered_map.hpp" />
+    <ClInclude Include="..\my_weak_ptr.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

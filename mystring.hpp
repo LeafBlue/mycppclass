@@ -196,7 +196,7 @@ public:
 
 
 	//从指定下标开始查找，并返回下标
-	int find(const char* _str, size_t index = 0) {
+	int find(const char* _str, const size_t index = 0) {
 		size_t _str_len = strlen(_str);
 		if (_str_len == 0) {
 			return 0;
